@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link href="style.css" rel="stylesheet">
+    <title>Login</title>
+</head>
+<body>
+    <header>
+        <h1>Login</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section>
+        <h2>Login to Your Account</h2>
+        <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Key:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">Login</button>
+    </form>
+    <p class="error-message">Invalid username or password.</p>
+    <p class="forgot-password"><a href="#">Forgot Password?</a></p>
+</div>
+
+    </section>
+    <footer>
+        <p>&copy; 2023 PawnMc</p>
+    </footer>
+    <script src="scripts.js"></script>
+    <script>
+        // Get the form and result elements
+        const loginForm = document.getElementById('loginForm');
+        const resultDiv = document.getElementById('result');
+
+        // Add a submit event listener to the form
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            // In a real application, you would validate the username and password
+            // against your server's database. For simplicity, we're using a hardcoded
+            // username and password here.
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Check if the username and password match (simplified example)
+            if (username === 'PawnMc' && password === 'PawnMc999045') {
+                // Redirect to the Go link after successful login (replace 'golink' with your actual Go link)
+                window.location.href = 'youtube.com';
+            } else {
+                // Display an error message for an incorrect login
+                resultDiv.innerHTML = 'Invalid username or password. Please try again.';
+            }
+        });
+    </script>
+</body>
+</html>
