@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DownloadHub</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<style>
+
+/* ================= ROOT ================= */
+
+:root{
+    --bg1:#0f172a;
+    --bg2:#111827;
+    --bg3:#1e293b;
+
+    --text:white;
+    --card:rgba(255,255,255,0.07);
+    --nav:rgba(0,0,0,0.4);
+    --modal:#111827;
+}
+
+body.light-mode{
+    --bg1:#e0f2fe;
+    --bg2:#ffffff;
+    --bg3:#dbeafe;
+
+    --text:#111827;
+    --card:rgba(255,255,255,0.9);
+    --nav:rgba(255,255,255,0.7);
+    --modal:#ffffff;
+}
+
+/* ================= GLOBAL ================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+    color:var(--text);
+    overflow-x:hidden;
+    transition:0.5s;
+}
+
+/* ================= SCROLLBAR ================= */
+
+::-webkit-scrollbar{
+    width:10px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:linear-gradient(#00f7ff,#ff00ea);
+    border-radius:20px;
+}
+
+/* ================= HEADER ================= */
+
+header{
+    width:100%;
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:999;
+    backdrop-filter:blur(12px);
+    background:var(--nav);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 7%;
+}
+
+.left-side{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+/* ================= LOGO ================= */
+
+.logo{
+    font-size:2rem;
+    font-weight:bold;
+    background:linear-gradient(to right,#00f7ff,#ff00ea,#ffd000);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+    from{
+        filter:drop-shadow(0 0 5px #00f7ff);
+    }
+    to{
+        filter:drop-shadow(0 0 20px #ff00ea);
+    }
+}
+
+/* ================= LINKS ================= */
+
+.nav-links{
+    display:flex;
+    gap:30px;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:var(--text);
+    transition:0.3s;
+    position:relative;
+}
+
+.nav-links a:hover{
+    color:#00f7ff;
+}
+
+.nav-links a::after{
+    content:'';
+    width:0%;
+    height:2px;
+    background:#00f7ff;
+    position:absolute;
+    left:0;
+    bottom:-5px;
+    transition:0.4s;
+}
+
+.nav-links a:hover::after{
+    width:100%;
+}
+
+/* ================= HAMBURGER ================= */
+
+.hamburger{
+    width:52px;
+    height:52px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(45deg,#00f7ff,#ff00ea);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+    transition:0.4s;
+}
+
+.hamburger:hover{
+    transform:scale(1.05);
+}
+
+.hamburger span{
+    width:24px;
+    height:3px;
+    background:white;
+    border-radius:10px;
+    transition:0.4s;
+}
+
+.hamburger.active span:nth-child(1){
+    transform:rotate(45deg) translateY(12px);
+}
+
+.hamburger.active span:nth-child(2){
+    opacity:0;
+}
+
+.hamburger.active span:nth-child(3){
+    transform:rotate(-45deg) translateY(-12px);
+}
+
+/* ================= DROPDOWN ================= */
+
+.dropdown{
+    width:100%;
+    overflow:hidden;
+    max-height:0;
+    transition:max-height 0.6s ease;
+    background:rgba(0,0,0,0.45);
+    backdrop-filter:blur(18px);
+}
+
+.dropdown.active{
+    max-height:350px;
+}
+
+.dropdown button{
+    width:100%;
+    padding:22px;
+    border:none;
+    background:none;
+    color:white;
+    font-size:1.1rem;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.dropdown button:hover{
+    background:linear-gradient(45deg,#00f7ff33,#ff00ea33);
+}
+
+/* ================= HERO ================= */
+
+.hero{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+    padding:150px 20px 50px;
+}
+
+.hero h1{
+    font-size:4rem;
+    max-width:950px;
+    line-height:1.2;
+    background:linear-gradient(to right,#00f7ff,#ff00ea,#ffd000);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.hero p{
+    margin-top:25px;
+    color:#cbd5e1;
+    font-size:1.2rem;
+    max-width:700px;
+}
+
+/* ================= TRENDING ================= */
+
+.trending{
+    margin-top:55px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+}
+
+.topic{
+    padding:15px 28px;
+    border-radius:50px;
+    background:rgba(255,255,255,0.08);
+    transition:0.4s;
+    cursor:pointer;
+}
+
+.topic:hover{
+    transform:translateY(-8px);
+    background:linear-gradient(45deg,#00f7ff,#ff00ea);
+}
+
+/* ================= DOWNLOAD SECTION ================= */
+
+.download-section{
+    padding:100px 10%;
+}
+
+.section-title{
+    text-align:center;
+    font-size:3rem;
+    margin-bottom:60px;
+    background:linear-gradient(to right,#00f7ff,#ff00ea);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:35px;
+}
+
+.card{
+    background:var(--card);
+    border-radius:25px;
+    padding:35px;
+    transition:0.5s;
+}
+
+.card:hover{
+    transform:translateY(-15px);
+    box-shadow:0 0 25px rgba(0,247,255,0.3);
+}
+
+/* ================= BUTTONS ================= */
+
+.download-btn,
+.secret-btn,
+.google-btn{
+    padding:14px 30px;
+    border:none;
+    border-radius:50px;
+    background:linear-gradient(45deg,#00f7ff,#ff00ea);
+    color:white;
+    cursor:pointer;
+    font-size:1rem;
+    transition:0.4s;
+}
+
+.download-btn:hover,
+.secret-btn:hover,
+.google-btn:hover{
+    transform:scale(1.08);
+}
+
+/* ================= SECRET BUTTON ================= */
+
+.secret-download{
+    display:flex;
+    justify-content:center;
+    margin:70px 0;
+}
+
+/* ================= MODALS ================= */
+
+.modal,
+.settings-modal,
+.sponsor-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.75);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+.modal-content,
+.settings-content,
+.sponsor-content{
+    width:400px;
+    background:var(--modal);
+    color:var(--text);
+    padding:35px;
+    border-radius:25px;
+    text-align:center;
+    position:relative;
+    animation:popup 0.4s ease;
+}
+
+@keyframes popup{
+    from{
+        transform:scale(0.6);
+        opacity:0;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+/* CLOSE BUTTONS */
+
+.close-btn,
+.close-settings,
+.close-sponsor{
+    position:absolute;
+    top:15px;
+    right:15px;
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    background:#374151;
+    color:white;
+    cursor:pointer;
+}
+
+/* ================= SETTINGS ================= */
+
+.setting-item{
+    margin-top:25px;
+    text-align:left;
+}
+
+.setting-item label{
+    display:block;
+    margin-bottom:10px;
+}
+
+.setting-item input[type="range"]{
+    width:100%;
+}
+
+/* ================= SPONSOR ================= */
+
+.fake-ad{
+    margin-top:25px;
+    padding:25px;
+    border-radius:20px;
+    background:linear-gradient(45deg,#00f7ff22,#ff00ea22);
+    cursor:pointer;
+    transition:0.4s;
+}
+
+.fake-ad:hover{
+    transform:scale(1.03);
+}
+
+.locked-download{
+    width:100%;
+    margin-top:25px;
+    padding:15px;
+    border:none;
+    border-radius:15px;
+    background:#374151;
+    color:white;
+    cursor:not-allowed;
+}
+
+.locked-download.active{
+    background:linear-gradient(45deg,#00f7ff,#ff00ea);
+    cursor:pointer;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+    text-align:center;
+    padding:40px;
+    color:#9ca3af;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+
+<header>
+
+<div class="navbar">
+
+<div class="left-side">
+
+<button class="hamburger" id="menuBtn">
+<span></span>
+<span></span>
+<span></span>
+</button>
+
+<div class="logo">
+DownloadHub
+</div>
+
+</div>
+
+<div class="nav-links">
+<a href="#home">Links</a>
+<a href="#downloads">Services</a>
+<a href="#downloads">Downloads</a>
+</div>
+
+</div>
+
+<!-- MENU -->
+
+<div class="dropdown" id="dropdownMenu">
+
+<button onclick="openProfile()">
+👤 Profile
+</button>
+
+<button onclick="openLogin()">
+🔐 Login With Google
+</button>
+
+<button onclick="openSettings()">
+⚙ Settings
+</button>
+
+</div>
+
+</header>
+
+<!-- ================= HERO ================= -->
+
+<section class="hero" id="home">
+
+<h1>
+Free Downloads & Trending Topics
+</h1>
+
+<p>
+Explore futuristic downloads, games, editing apps,
+AI tools and more.
+</p>
+
+<div class="trending">
+
+<div class="topic">🔥 AI Tools</div>
+<div class="topic">🎮 Games</div>
+<div class="topic">🎵 Music</div>
+<div class="topic">🎬 Editors</div>
+<div class="topic">💻 Coding</div>
+
+</div>
+
+</section>
+
+<!-- ================= DOWNLOADS ================= -->
+
+<section class="download-section" id="downloads">
+
+<h1 class="section-title">
+Popular Downloads
+</h1>
+
+<div class="cards">
+
+<div class="card">
+
+<h2>Photo Editor Pro</h2>
+
+<p>
+Advanced editing software for creators.
+</p>
+
+<br>
+
+<button class="download-btn"
+onclick="downloadItem('Photo Editor Pro')">
+Download
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Gaming Launcher</h2>
+
+<p>
+Launch and manage your games easily.
+</p>
+
+<br>
+
+<button class="download-btn"
+onclick="downloadItem('Gaming Launcher')">
+Download
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Music Studio</h2>
+
+<p>
+Professional beat making tools.
+</p>
+
+<br>
+
+<button class="download-btn"
+onclick="downloadItem('Music Studio')">
+Download
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= SECRET DOWNLOAD ================= -->
+
+<section class="secret-download">
+
+<button class="secret-btn"
+onclick="openSponsorModal()">
+
+🎁 Secret Download
+
+</button>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+© 2026 DownloadHub • All Rights Reserved
+</footer>
+
+<!-- ================= LOGIN MODAL ================= -->
+
+<div class="modal" id="loginModal">
+
+<div class="modal-content">
+
+<button class="close-btn"
+onclick="closeModal()">
+✕
+</button>
+
+<h2>
+Login With Google
+</h2>
+
+<p style="margin-top:10px;color:#9ca3af;">
+Secure third-party authentication.
+</p>
+
+<button class="google-btn"
+id="googleLoginBtn"
+style="width:100%;margin-top:30px;display:flex;align-items:center;justify-content:center;gap:10px;">
+
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+width="22">
+
+Continue With Google
+
+</button>
+
+</div>
+
+</div>
+
+<!-- ================= SETTINGS ================= -->
+
+<div class="settings-modal"
+id="settingsModal">
+
+<div class="settings-content">
+
+<button class="close-settings"
+onclick="closeSettings()">
+✕
+</button>
+
+<h2>
+⚙ Settings
+</h2>
+
+<div class="setting-item">
+
+<label>
+🌞 Bright Mode
+</label>
+
+<button class="download-btn"
+onclick="enableLightMode()">
+Enable Bright Mode
+</button>
+
+</div>
+
+<div class="setting-item">
+
+<label>
+🌙 Dark Mode
+</label>
+
+<button class="download-btn"
+onclick="enableDarkMode()">
+Enable Dark Mode
+</button>
+
+</div>
+
+<div class="setting-item">
+
+<label>
+🔠 Text Size
+</label>
+
+<input type="range"
+min="14"
+max="24"
+value="16"
+id="textSizeSlider">
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ================= SPONSOR MODAL ================= -->
+
+<div class="sponsor-modal"
+id="sponsorModal">
+
+<div class="sponsor-content">
+
+<button class="close-sponsor"
+onclick="closeSponsorModal()">
+✕
+</button>
+
+<h2>
+Unlock Download
+</h2>
+
+<p style="margin-top:15px;color:#9ca3af;">
+Click the sponsor card to unlock your download.
+</p>
+
+<!-- TIKTOK SPONSOR -->
+
+<div class="fake-ad"
+onclick="activateDownload()">
+
+<h3>
+🔥 Sponsored TikTok
+</h3>
+
+<p style="margin-top:10px;">
+Support us by visiting our TikTok sponsor.
+</p>
+
+<div style="
+margin-top:15px;
+padding:12px;
+border-radius:12px;
+background:rgba(255,255,255,0.08);
+">
+
+▶ Click To Visit Sponsor
+
+</div>
+
+</div>
+
+<!-- DOWNLOAD BUTTON -->
+
+<button class="locked-download"
+id="unlockBtn"
+disabled>
+
+🔒 Locked Download
+
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* ================= FIREBASE CONFIG ================= */
+
+/* REPLACE WITH YOUR OWN FIREBASE CONFIG */
+
+const firebaseConfig = {
+
+apiKey: "YOUR_API_KEY",
+
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+
+projectId: "YOUR_PROJECT_ID",
+
+appId: "YOUR_APP_ID"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+
+/* ================= USER SYSTEM ================= */
+
+let loggedIn = false;
+let currentUser = "";
+
+/* ================= MENU ================= */
+
+const menuBtn =
+document.getElementById("menuBtn");
+
+const dropdown =
+document.getElementById("dropdownMenu");
+
+menuBtn.addEventListener("click", () => {
+
+dropdown.classList.toggle("active");
+
+menuBtn.classList.toggle("active");
+
+});
+
+/* ================= LOGIN MODAL ================= */
+
+function openLogin(){
+
+document.getElementById("loginModal")
+.style.display = "flex";
+
+}
+
+function closeModal(){
+
+document.getElementById("loginModal")
+.style.display = "none";
+
+}
+
+/* ================= GOOGLE LOGIN ================= */
+
+document.getElementById("googleLoginBtn")
+.addEventListener("click", async () => {
+
+const provider =
+new firebase.auth.GoogleAuthProvider();
+
+try{
+
+const result =
+await auth.signInWithPopup(provider);
+
+const user = result.user;
+
+loggedIn = true;
+
+currentUser = user.displayName;
+
+alert("Welcome " + currentUser + "!");
+
+closeModal();
+
+}catch(error){
+
+alert("Login Failed: " + error.message);
+
+}
+
+});
+
+/* ================= PROFILE ================= */
+
+function openProfile(){
+
+if(loggedIn){
+
+alert("Welcome to your profile, " + currentUser);
+
+}else{
+
+alert("Please login first.");
+
+openLogin();
+
+}
+
+}
+
+/* ================= SETTINGS ================= */
+
+function openSettings(){
+
+document.getElementById("settingsModal")
+.style.display = "flex";
+
+}
+
+function closeSettings(){
+
+document.getElementById("settingsModal")
+.style.display = "none";
+
+}
+
+/* LIGHT MODE */
+
+function enableLightMode(){
+
+document.body.classList.add("light-mode");
+
+}
+
+/* DARK MODE */
+
+function enableDarkMode(){
+
+document.body.classList.remove("light-mode");
+
+}
+
+/* TEXT SIZE */
+
+const slider =
+document.getElementById("textSizeSlider");
+
+slider.addEventListener("input", () => {
+
+document.body.style.fontSize =
+slider.value + "px";
+
+});
+
+/* ================= DOWNLOADS ================= */
+
+function downloadItem(item){
+
+if(loggedIn){
+
+alert("Downloading " + item + "...");
+
+}else{
+
+alert("Please login before downloading.");
+
+openLogin();
+
+}
+
+}
+
+/* ================= SPONSOR SYSTEM ================= */
+
+let countdownTimer = null;
+
+function openSponsorModal(){
+
+document.getElementById("sponsorModal")
+.style.display = "flex";
+
+}
+
+/* CLOSE SPONSOR */
+
+function closeSponsorModal(){
+
+document.getElementById("sponsorModal")
+.style.display = "none";
+
+resetSponsorSystem();
+
+}
+
+/* RESET SYSTEM */
+
+function resetSponsorSystem(){
+
+clearInterval(countdownTimer);
+
+const unlockBtn =
+document.getElementById("unlockBtn");
+
+unlockBtn.disabled = true;
+
+unlockBtn.classList.remove("active");
+
+unlockBtn.innerHTML =
+"🔒 Locked Download";
+
+unlockBtn.onclick = null;
+
+}
+
+/* ACTIVATE DOWNLOAD */
+
+function activateDownload(){
+
+const unlockBtn =
+document.getElementById("unlockBtn");
+
+/* PREVENT MULTIPLE TIMERS */
+
+if(unlockBtn.classList.contains("active") ||
+unlockBtn.innerHTML.includes("Wait")){
+return;
+}
+
+/* OPEN TIKTOK SPONSOR */
+
+window.open(
+"https://vt.tiktok.com/ZS9nX2JTh/",
+"_blank"
+);
+
+/* COUNTDOWN */
+
+let countdown = 5;
+
+unlockBtn.innerHTML =
+"⏳ Wait " + countdown + "s";
+
+countdownTimer = setInterval(() => {
+
+countdown--;
+
+unlockBtn.innerHTML =
+"⏳ Wait " + countdown + "s";
+
+if(countdown <= 0){
+
+clearInterval(countdownTimer);
+
+unlockBtn.disabled = false;
+
+unlockBtn.classList.add("active");
+
+unlockBtn.innerHTML =
+"⬇ Download Now";
+
+/* DOWNLOAD LINK */
+
+unlockBtn.onclick = () => {
+
+window.location.href =
+"https://example.com/download";
+
+};
+
+}
+
+},1000);
+
+}
+
+/* ================= CLOSE OUTSIDE ================= */
+
+window.onclick = function(event){
+
+const loginModal =
+document.getElementById("loginModal");
+
+const settingsModal =
+document.getElementById("settingsModal");
+
+const sponsorModal =
+document.getElementById("sponsorModal");
+
+if(event.target == loginModal){
+
+closeModal();
+
+}
+
+if(event.target == settingsModal){
+
+closeSettings();
+
+}
+
+if(event.target == sponsorModal){
+
+closeSponsorModal();
+
+}
+
+};
+
+</script>
+
+</body>
+</html>
